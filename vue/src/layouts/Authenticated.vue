@@ -7,12 +7,6 @@
                         <span class="fs-4">COVID-19 WEB</span>
                     </router-link>
                 </a>
-                <div class="text-center">
-                    <div>Hi, {{ user.name }}</div>
-                    <div class="text-sm text-gray-500">{{ user.email }}</div>
-                    <div class="text-sm text-gray-500">{{ user.nameType }}</div>
-                </div>
-
                 <ul class="nav nav-pills">
                     <li class="nav-item"><a href="#" class="nav-link">
                             <router-link :to="{ name: 'inserirData' }" class="nav-item">
@@ -20,6 +14,12 @@
                             </router-link></a>
                     </li>
                 </ul>
+                <div class="text-center">
+                    <div>Hi, {{ user.name }}</div>
+                    <div class="text-sm text-gray-500">{{ user.email }}</div>
+                    <div class="text-sm text-gray-500">{{ user.nameType }}</div>
+                </div>
+
                 <button @click="logout" type="button"
                     class="item_button inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent  font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 active:bg-gray-900 focus:outline-none focus:border-gray-900 focus:shadow-outline-gray transition ease-in-out duration-150 ml-4"
                     :class="{ 'opacity-25': processing }" :disabled="processing">
