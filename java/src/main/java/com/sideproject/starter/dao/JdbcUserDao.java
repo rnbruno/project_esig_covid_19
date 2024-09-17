@@ -1,8 +1,12 @@
 package com.sideproject.starter.dao;
 
-import com.sideproject.starter.exception.DaoException;
-import com.sideproject.starter.model.RegisterUserDto;
-import com.sideproject.starter.model.User;
+import java.math.BigDecimal;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,10 +14,9 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.List;
+import com.sideproject.starter.exception.DaoException;
+import com.sideproject.starter.model.RegisterUserDto;
+import com.sideproject.starter.model.User;
 
 @Component
 public class JdbcUserDao implements UserDao {
@@ -23,6 +26,28 @@ public class JdbcUserDao implements UserDao {
 
     public JdbcUserDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+    }
+
+    @PostConstruct
+    public void createTablesIfNotExist() {
+        // SQL para criar a tabela tenmo_user
+        String createUserTableSql = "CREATE TABLE IF NOT EXISTS tenmo_user (" +
+                "user_id SERIAL PRIMARY KEY, " +
+                "username VARCHAR(255) UNIQUE NOT NULL, " +
+                "password_hash VARCHAR(255) NOT NULL " +
+                ")";
+
+        // SQL para criar a tabela account
+        String createAccountTableSql = "CREATE TABLE IF NOT EXISTS account (" +
+                "account_id SERIAL PRIMARY KEY, " +
+                "user_id INTEGER NOT NULL, " +
+                "balance NUMERIC(19, 2) NOT NULL, " +
+                "FOREIGN KEY (user_id) REFERENCES tenmo_user(user_id)" +
+                ")";
+
+        // Executa as duas instruções SQL
+        jdbcTemplate.execute(createUserTableSql);
+        jdbcTemplate.execute(createAccountTableSql);
     }
 
     @Override
@@ -58,7 +83,8 @@ public class JdbcUserDao implements UserDao {
 
     @Override
     public User getUserByUsername(String username) {
-        if (username == null) throw new IllegalArgumentException("Username cannot be null");
+        if (username == null)
+            throw new IllegalArgumentException("Username cannot be null");
         User user = null;
         String sql = "SELECT user_id, username, password_hash FROM tenmo_user WHERE username = ?;";
         try {

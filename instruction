@@ -1,0 +1,6 @@
+
+mvn clean install -DskipTests
+mvn versions:display-dependency-updates
+mvn versions:use-latest-releases
+
+mvn versions:commit

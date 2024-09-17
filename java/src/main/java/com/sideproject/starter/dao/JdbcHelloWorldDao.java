@@ -1,24 +1,26 @@
 package com.sideproject.starter.dao;
 
-import com.sideproject.starter.exception.DaoException;
-import com.sideproject.starter.model.HelloWorld;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.stereotype.Component;
 import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
 
-
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.List;
+import com.sideproject.starter.exception.DaoException;
+import com.sideproject.starter.model.HelloWorld;
 
 @Component
 public class JdbcHelloWorldDao implements HelloWorldDao {
 
     private JdbcTemplate jdbcTemplate;
-    public JdbcHelloWorldDao(@NonNull DataSource dataSource){
+
+    public JdbcHelloWorldDao(@NonNull DataSource dataSource) {
         jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
@@ -28,7 +30,7 @@ public class JdbcHelloWorldDao implements HelloWorldDao {
         String sql = "SELECT message FROM greetings LIMIT 1";
         try {
             SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
-            if (results.next()){
+            if (results.next()) {
                 helloWorld.setMessage(results.getString("message"));
             } else {
                 throw new DaoException("No message found");
@@ -39,15 +41,14 @@ public class JdbcHelloWorldDao implements HelloWorldDao {
         return helloWorld;
     }
 
-
     @Override
-    public HelloWorld addMessage(HelloWorld helloWorld){
+    public HelloWorld addMessage(HelloWorld helloWorld) {
         String sql = "INSERT INTO greetings (message) VALUES (?);";
         try {
             int results = jdbcTemplate.update(sql, helloWorld.getMessage());
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             throw new DaoException("Returns null.", e);
-        }catch (CannotGetJdbcConnectionException e) {
+        } catch (CannotGetJdbcConnectionException e) {
             throw new DaoException("Unable to connect to the database.", e);
         } catch (DataIntegrityViolationException e) {
             throw new DaoException("Data integrity violation.", e);
@@ -62,7 +63,7 @@ public class JdbcHelloWorldDao implements HelloWorldDao {
         String sql = "SELECT message FROM greetings";
         try {
             SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
-            while (results.next()){
+            while (results.next()) {
                 helloWorldList.add(mapRowsToHello(results));
             }
         } catch (CannotGetJdbcConnectionException e) {
@@ -70,7 +71,8 @@ public class JdbcHelloWorldDao implements HelloWorldDao {
         }
         return helloWorldList;
     }
-    public HelloWorld mapRowsToHello(SqlRowSet rowSet){
+
+    public HelloWorld mapRowsToHello(SqlRowSet rowSet) {
         HelloWorld helloWorld = new HelloWorld();
         helloWorld.setMessage(rowSet.getString("message"));
         return helloWorld;
